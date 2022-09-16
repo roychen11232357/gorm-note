@@ -1,6 +1,5 @@
 # test
 
-{% code lineNumbers="true" %}
 ```go
 package main
 
@@ -18,6 +17,7 @@ func main() {
 	dbname := "postgres"
 	port := "5432"
 	applicationName := "gorm-play"
+	poolSize := 5
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s application_name=%s",
 		host,
@@ -39,17 +39,18 @@ func main() {
 		fmt.Println(err)
 	}
 
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(10)
+	sqlDB.SetMaxIdleConns(poolSize)
+	sqlDB.SetMaxOpenConns(poolSize)
 
-	sqlDB.Ping()
+	for i := 0; i < poolSize; i++ {
+		go sqlDB.Ping()
+	}
 
 	select {}
 }
 
 ```
-{% endcode %}
 
 * `sqlDB.Ping() 實際上是執1;`
 * application\_name可以對connection做搜尋
-* grom的連線池好像只有這兩個func可以使用, 應該沒有一啟動就佔滿連線池的設定, 需要的話要自己實作(跑對應次數的Ping應該可以)
+* grom的連線池好像只有這兩個func可以使用, 應該沒有一啟動就佔滿連線池的設定, 需要的話要自己實作
