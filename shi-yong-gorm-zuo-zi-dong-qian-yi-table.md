@@ -37,6 +37,25 @@ CREATE INDEX IF NOT EXISTS "idx_gorm_test_user_deleted_at" ON "gorm_test"."user"
 
 
 
+這裡補充一個跟go有關的東西, 就是User struct裏頭, 為什麼有一個沒匿名 (`gorm.Model`) 的欄位呢? 在go中這叫嵌入(Embedding)模式, 可以把該嵌入的struct在外層攤平, 來看看`gorm.Model`就知道了
+
+```go
+type Model struct {
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt DeletedAt `gorm:"index"`
+}
+```
+
+接著透過IDE觀察攤平是什麼效果
+
+![](.gitbook/assets/image.png)
+
+所以說, 如果你不想要gorm預設幫你加delete欄位, 你可以自己建一個Embedding struct, 應該就可以辦到
+
+
+
 完整代碼
 
 ```go
@@ -44,7 +63,7 @@ package main
 
 import (
 	"fmt"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver, /postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
