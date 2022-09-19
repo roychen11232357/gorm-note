@@ -74,6 +74,5 @@ func automigrateTest() {
 
 	db.Exec("CREATE SCHEMA IF NOT EXISTS " + schemaName)
 }
-g
 ```
 
