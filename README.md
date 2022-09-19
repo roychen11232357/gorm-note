@@ -1,7 +1,7 @@
----
-description: 紀錄使用gorm的一些小東西
----
+# OMG
 
-# Gorm Note
+123123123
 
-Test
+{% content-ref url="shi-yong-gorm-zuo-zi-dong-qian-yi-table.md" %}
+[shi-yong-gorm-zuo-zi-dong-qian-yi-table.md](shi-yong-gorm-zuo-zi-dong-qian-yi-table.md)
+{% endcontent-ref %}
