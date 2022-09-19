@@ -3,3 +3,4 @@
 * [Gorm Note](README.md)
 * [gorm pg使用連線池初始化](gorm-pg-shi-yong-lian-xian-chi-chu-shi-hua.md)
 * [使用gorm做自動遷移table](shi-yong-gorm-zuo-zi-dong-qian-yi-table.md)
+* [gorm配合pg時的schema問題](gorm-pei-he-pg-shi-de-schema-wen-ti.md)
