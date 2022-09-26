@@ -41,5 +41,19 @@ INSERT INTO "gorm_test"."user" ("created_at","updated_at","first_name") VALUES (
 
 可以發現LastName就沒寫進去了, 但這裡有一點跟網路上其他文章不太一樣, 有些文章提到, 如果是用這種部分欄位寫入的方式, 會繞過gorm預設的create\_at, update\_at, 但我實測後還是會有這些值喔, 可能是版本的差異
 
+### 指定排除特定欄位(負向表列, 黑名單)
 
+```
+user := User{FirstName: "Roy", LastName: "Chen"}
+result := db.Omit("FirstName", "LastName", "CreatedAt", "UpdatedAt").Create(&user)
+```
 
+產生的sql
+
+{% code overflow="wrap" %}
+```
+INSERT INTO "gorm_test"."user" ("deleted_at") VALUES (NULL) RETURNING "id"
+```
+{% endcode %}
+
+所以用omit是可以濾掉gorm.Mode那幾個欄位("CreatedAt", "UpdatedAt")的, 這跟網路上一些舊版資料也有差異
