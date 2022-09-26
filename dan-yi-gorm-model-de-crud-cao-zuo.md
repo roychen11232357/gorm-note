@@ -88,7 +88,62 @@ INSERT INTO "gorm_test"."user" ("created_at","updated_at","deleted_at","first_na
 result := db.CreateInBatches(&users, 1)
 ```
 
+## READ
 
+### 查一筆資料
 
+#### First
 
+```
+result := db.First(&user)
 
+if result.Error != gorm.ErrRecordNotFound {
+	fmt.Println(user)
+}
+```
+
+產生
+
+{% code overflow="wrap" %}
+```
+SELECT * FROM "gorm_test"."user" WHERE "user"."deleted_at" IS NULL ORDER BY "user"."id" LIMIT 1
+```
+{% endcode %}
+
+#### Last
+
+```
+result := db.Last(&user)
+```
+
+產生
+
+{% code overflow="wrap" %}
+```
+SELECT * FROM "gorm_test"."user" WHERE "user"."deleted_at" IS NULL ORDER BY "user"."id" DESC LIMIT 1
+```
+{% endcode %}
+
+#### Take
+
+```
+result := db.Take(&user)
+```
+
+產生
+
+```
+SELECT * FROM "gorm_test"."user" WHERE "user"."deleted_at" IS NULL LIMIT 1
+```
+
+可以發現上面3種只取一筆的操作, 會拋出gorm.ErrRecordNotFound, 畢竟是只取1筆, 並不是一個清單, 這樣設計也是合理
+
+### 查多筆資料
+
+```
+var users []User
+
+result := db.Find(&users)
+```
+
+有一點要注意的, 因為是返回列表, 所以gorm設計上, 即便是空slice, 也不會拋出ErrRecordNotFound
