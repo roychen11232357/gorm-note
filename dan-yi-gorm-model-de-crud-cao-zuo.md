@@ -57,3 +57,83 @@ INSERT INTO "gorm_test"."user" ("deleted_at") VALUES (NULL) RETURNING "id"
 {% endcode %}
 
 所以用omit是可以濾掉gorm.Mode那幾個欄位("CreatedAt", "UpdatedAt")的, 這跟網路上一些舊版資料也有差異
+
+### 批量寫入
+
+```
+users := []User{
+	{FirstName: "Roy1", LastName: "Chen"},
+	{FirstName: "Roy2", LastName: "Chen"},
+	{FirstName: "Roy3", LastName: "Chen"},
+}
+
+result := db.Create(&users)
+```
+
+產生的sql
+
+{% code overflow="wrap" %}
+```
+INSERT INTO "gorm_test"."user" ("created_at","updated_at","deleted_at","first_name","last_name") VALUES ('2022-09-26 14:19:13.18','2022-09-26 14:19:13.18',NULL,'Roy1','Chen'),('2022-09-26 14:19:13.18','2022-09-26 14:19:13.18',NULL,'Roy2','Chen'),('2022-09-26 14:19:13.18','2022-09-26 14:19:13.18',NULL,'Roy3','Chen') RETURNING "id"
+```
+{% endcode %}
+
+可以看到, 是有RETURNING "id" 這個東西, 代表就算是batch insert, 還是會有id的喔
+
+### 分批批量寫入
+
+上面的批量寫入實際上是塞在同一個sql裡面, 但如果量大時, 可能會遇到語法上限, 或是效能問題, 這是把同一批insert切成多批是一個比較好的做法
+
+```
+result := db.CreateInBatches(&users, 1)
+```
+
+## READ
+
+### 查一筆資料
+
+#### First
+
+```
+result := db.First(&user)
+
+if result.Error != gorm.ErrRecordNotFound {
+	fmt.Println(user)
+}
+```
+
+產生
+
+{% code overflow="wrap" %}
+```
+SELECT * FROM "gorm_test"."user" WHERE "user"."deleted_at" IS NULL ORDER BY "user"."id" LIMIT 1
+```
+{% endcode %}
+
+#### Last
+
+```
+result := db.Last(&user)
+```
+
+產生
+
+{% code overflow="wrap" %}
+```
+SELECT * FROM "gorm_test"."user" WHERE "user"."deleted_at" IS NULL ORDER BY "user"."id" DESC LIMIT 1
+```
+{% endcode %}
+
+#### Take
+
+```
+result := db.Take(&user)
+```
+
+產生
+
+```
+SELECT * FROM "gorm_test"."user" WHERE "user"."deleted_at" IS NULL LIMIT 1
+```
+
+可以發現上面3種只取一筆的操作, 會拋出gorm.ErrRecordNotFound, 畢竟是只取1筆, 並不是一個清單, 這樣設計也是合理
